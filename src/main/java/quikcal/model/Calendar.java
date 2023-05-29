@@ -1,5 +1,8 @@
 package quikcal.model;
 
-public record Calendar(String summary, String id) {
+
+import jakarta.validation.constraints.NotEmpty;
+
+public record Calendar(@NotEmpty String summary, String id) {
 
 }

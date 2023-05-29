@@ -1,6 +1,7 @@
 package quikcal.database;
 
 import com.google.api.services.calendar.model.CalendarListEntry;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import quikcal.model.Calendar;
@@ -27,7 +28,7 @@ public class GoogleCalendars implements Calendars {
   }
 
   @Override
-  public Calendar insert(Calendar calendar) throws Exception {
+  public Calendar insert(Calendar calendar) throws IOException {
     com.google.api.services.calendar.model.Calendar googleCalendar = service.calendars()
         .insert(toGoogleCalendar(calendar)).execute();
     CalendarListEntry calendarListEntry = new CalendarListEntry();
@@ -37,18 +38,18 @@ public class GoogleCalendars implements Calendars {
 
   }
   @Override
-  public Calendar get(String id) throws Exception {
-    return toCalendar(service.calendars().get(id).execute());
+  public Calendar get(String calendarId) throws IOException {
+    return toCalendar(service.calendars().get(calendarId).execute());
   }
 
   @Override
-  public Calendar update(String id, Calendar calendar) throws Exception {
-    service.calendars().update(id, toGoogleCalendar(calendar)).execute();
+  public Calendar update(String calendarId, Calendar calendar) throws IOException {
+    service.calendars().update(calendarId, toGoogleCalendar(calendar)).execute();
     return calendar;
   }
 
   @Override
-  public List<Calendar> list() throws Exception {
+  public List<Calendar> list() throws IOException {
     List<Calendar> calendars = new ArrayList<>();
     for (CalendarListEntry calendarListEntry : service.calendarList().list().execute().getItems()) {
       calendars.add(toCalendar(service.calendars().get(calendarListEntry.getId()).execute()));
@@ -57,7 +58,7 @@ public class GoogleCalendars implements Calendars {
   }
 
   @Override
-  public void delete(String id) throws Exception {
-    service.calendars().delete(id).execute();
+  public void delete(String calendarId) throws IOException {
+    service.calendars().delete(calendarId).execute();
   }
 }

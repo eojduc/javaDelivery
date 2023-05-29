@@ -18,12 +18,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
+import quikcal.Application;
 import quikcal.controller.CalendarsController;
 
 
 public class GoogleDatabase implements Database {
-
-  private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
   /**
    * Global instance of the JSON factory.
    */
@@ -39,15 +38,14 @@ public class GoogleDatabase implements Database {
    */
   private static final List<String> SCOPES =
       Collections.singletonList(CalendarScopes.CALENDAR);
-  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
   private final Calendars calendars;
   private final Events events;
 
-  public GoogleDatabase() throws Exception {
+  public GoogleDatabase(Application.Config config) throws Exception {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-        getCredentials(HTTP_TRANSPORT))
-        .setApplicationName(APPLICATION_NAME)
+        getCredentials(HTTP_TRANSPORT, config.database().credentials()))
+        .setApplicationName(config.name())
         .build();
     calendars = new GoogleCalendars(service);
     events = new GoogleEvents(service);
@@ -60,12 +58,12 @@ public class GoogleDatabase implements Database {
    * @return An authorized Credential object.
    * @throws IOException If the credentials.json file cannot be found.
    */
-  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String credentialsFilePath)
       throws IOException {
     // Load client secrets.
-    InputStream in = CalendarsController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+    InputStream in = CalendarsController.class.getResourceAsStream(credentialsFilePath);
     if (in == null) {
-      throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+      throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
     }
     GoogleClientSecrets clientSecrets =
         GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));

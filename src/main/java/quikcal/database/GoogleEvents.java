@@ -1,6 +1,7 @@
 package quikcal.database;
 
 import com.google.api.client.util.DateTime;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import quikcal.model.Event;
@@ -29,28 +30,28 @@ public class GoogleEvents implements Events {
   }
 
   @Override
-  public Event insert(String calendarId, Event event) throws Exception {
+  public Event insert(String calendarId, Event event) throws IOException {
     return GoogleEvents.toEvent(service.events().insert(calendarId, toGoogleEvent(event)).execute());
   }
 
   @Override
-  public Event get(String calendarId, String eventId) throws Exception {
+  public Event get(String calendarId, String eventId) throws IOException {
     return GoogleEvents.toEvent(service.events().get(calendarId, eventId).execute());
   }
 
   @Override
-  public Event update(String calendarId, String eventId, Event event) throws Exception {
+  public Event update(String calendarId, String eventId, Event event) throws IOException {
     service.events().update(calendarId, eventId, toGoogleEvent(event)).execute();
     return event;
   }
 
   @Override
-  public void delete(String calendarId, String eventId) throws Exception {
+  public void delete(String calendarId, String eventId) throws IOException {
     service.events().delete(calendarId, eventId).execute();
   }
 
   @Override
-  public List<Event> list(String calendarId) throws Exception {
+  public List<Event> list(String calendarId) throws IOException {
     return service.events().list(calendarId).execute().getItems().stream()
         .map(GoogleEvents::toEvent)
         .toList();
