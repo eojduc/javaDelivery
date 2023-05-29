@@ -6,6 +6,10 @@ import java.util.Map;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+/**
+ * static methods common amongst controllers
+ */
+
 public interface Controller {
 
   static Map<String, String> handleValidationException(MethodArgumentNotValidException exception) {

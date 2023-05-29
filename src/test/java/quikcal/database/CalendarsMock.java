@@ -3,9 +3,10 @@ package quikcal.database;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import quikcal.database.Database.CalendarTable;
 import quikcal.model.Calendar;
 
-public class CalendarsMock implements Calendars {
+public class CalendarsMock implements CalendarTable {
   private final List<Calendar> calendars;
   private int count;
   public CalendarsMock() {

@@ -2,11 +2,9 @@ package quikcal.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,14 +17,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import quikcal.Application;
 import quikcal.database.Database;
-import quikcal.database.GoogleDatabase;
 import quikcal.model.Event;
 
 @RestController
 public class EventsController {
 
-  private final Database database;
   private static final String PATH = "/events";
+  private final Database database;
 
   public EventsController()
       throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -46,7 +43,7 @@ public class EventsController {
   @PatchMapping(PATH + "/{calendarId}/{eventId}")
   Event eventPatch(@PathVariable String calendarId, @PathVariable String eventId,
       @RequestBody Event event) throws IOException {
-      return this.database.events().update(calendarId, eventId, event);
+    return this.database.events().update(calendarId, eventId, event);
   }
 
   @PostMapping(PATH + "/{calendarId}")
@@ -55,7 +52,8 @@ public class EventsController {
   }
 
   @DeleteMapping(PATH + "/{calendarId}/{eventId}")
-  String eventDelete(@PathVariable String calendarId, @PathVariable String eventId) throws IOException {
+  String eventDelete(@PathVariable String calendarId, @PathVariable String eventId)
+      throws IOException {
     this.database.events().delete(calendarId, eventId);
     return "Event deleted";
   }
