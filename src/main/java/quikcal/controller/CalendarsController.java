@@ -18,7 +18,7 @@ import quikcal.model.Calendar;
 
 
 @RestController
-@RequestMapping("/calendars")
+@RequestMapping("/")
 public class CalendarsController implements Controller {
   private final Database database;
 
