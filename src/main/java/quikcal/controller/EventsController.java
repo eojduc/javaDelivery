@@ -22,7 +22,7 @@ public class EventsController implements Controller {
 
   public EventsController()
       throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-    this.database = Database.create(Application.config());
+    this.database = Database.create(Application.config().database());
   }
 
   @GetMapping("{calendarId}")

@@ -16,12 +16,12 @@ public interface Database {
   /**
    * Creates a database based on the configuration.
    */
-  static Database create(Configuration configuration)
+  static Database create(Configuration.Database configuration)
       throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
     ResourceBundle bundle = ResourceBundle.getBundle(Database.class.getSimpleName());
-    return Class.forName(bundle.getString(configuration.database().type()))
+    return Class.forName(bundle.getString(configuration.type()))
         .asSubclass(Database.class)
-        .getConstructor(Configuration.class).newInstance(configuration);
+        .getConstructor(Configuration.Database.class).newInstance(configuration);
   }
 
   CalendarTable calendars();

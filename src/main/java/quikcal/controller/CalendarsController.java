@@ -24,7 +24,7 @@ public class CalendarsController implements Controller {
 
   CalendarsController()
       throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-    this.database = Database.create(Application.config());
+    this.database = Database.create(Application.config().database());
   }
   @GetMapping("")
   List<Calendar> list() throws IOException {

@@ -32,10 +32,10 @@ public class GoogleDatabase implements Database {
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
   private final com.google.api.services.calendar.Calendar service;
 
-  public GoogleDatabase(Configuration configuration) throws Exception {
+  public GoogleDatabase(Configuration.Database configuration) throws Exception {
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-    Credential credential = GoogleDatabase.getCredentials(httpTransport, configuration.database().credentials(), List.of(CalendarScopes.CALENDAR), jsonFactory);
+    Credential credential = GoogleDatabase.getCredentials(httpTransport, configuration.credentials(), List.of(CalendarScopes.CALENDAR), jsonFactory);
     this.service = new com.google.api.services.calendar.Calendar.Builder(httpTransport,
         jsonFactory,
         credential).build();

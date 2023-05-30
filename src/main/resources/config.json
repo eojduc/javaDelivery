@@ -1,5 +1,4 @@
 {
-  "name": "quikcal",
   "database": {
     "type": "google",
     "credentials": "/credentials.json"
