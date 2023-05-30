@@ -3,16 +3,22 @@ package quikcal.controller;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * static methods common amongst controllers
+ * Provides default exception handling for all controllers.
  */
-
+@RestController
 public interface Controller {
-
-  static Map<String, String> handleValidationException(MethodArgumentNotValidException exception) {
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  default Map<String, String> handleValidationExceptions(
+      MethodArgumentNotValidException exception) {
     Map<String, String> errors = new HashMap<>();
     exception.getBindingResult().getAllErrors().forEach((error) -> {
       String fieldName = ((FieldError) error).getField();
@@ -22,7 +28,9 @@ public interface Controller {
     return errors;
   }
 
-  static String handleIOException(IOException exception) {
+  @ResponseStatus(HttpStatus.BAD_GATEWAY)
+  @ExceptionHandler(IOException.class)
+  default String handleIOExceptions(IOException exception) {
     return "Failed to connect to database: " + exception.getMessage();
   }
 

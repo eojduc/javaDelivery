@@ -28,8 +28,6 @@ public interface Database {
 
   EventTable events();
 
-
-
   interface EventTable {
 
     Event insert(String calendarId, Event event) throws IOException;
@@ -43,7 +41,6 @@ public interface Database {
     List<Event> list(String calendarId) throws IOException;
 
   }
-
   interface CalendarTable {
 
     Calendar insert(Calendar request) throws IOException;

@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import quikcal.Configuration;
 import quikcal.controller.CalendarsController;
@@ -27,55 +26,41 @@ import quikcal.model.Event;
 
 
 public class GoogleDatabase implements Database {
-
-  /**
-   * Global instance of the JSON factory.
-   */
-  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   /**
    * Directory to store authorization tokens for this application.
    */
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
-
-  /**
-   * Global instance of the scopes required by this quickstart. If modifying these scopes, delete
-   * your previously saved tokens/ folder.
-   */
-  private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
   private final com.google.api.services.calendar.Calendar service;
   private final CalendarTable calendarTable;
   private final EventTable eventTable;
 
   public GoogleDatabase(Configuration configuration) throws Exception {
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    this.service = new com.google.api.services.calendar.Calendar.Builder(HTTP_TRANSPORT,
-        JSON_FACTORY,
-        getCredentials(HTTP_TRANSPORT, configuration.database().credentials())).setApplicationName(
-        configuration.name()).build();
+    final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+    final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+    Credential credential = GoogleDatabase.getCredentials(httpTransport, configuration.database().credentials(), List.of(CalendarScopes.CALENDAR), jsonFactory);
+    this.service = new com.google.api.services.calendar.Calendar.Builder(httpTransport,
+        jsonFactory,
+        credential).build();
     this.calendarTable = new GoogleCalendarTable();
     this.eventTable = new GoogleEventTable();
   }
 
   /**
    * Creates an authorized Credential object.
-   *
-   * @param HTTP_TRANSPORT The network HTTP Transport.
-   * @return An authorized Credential object.
-   * @throws IOException If the credentials.json file cannot be found.
    */
-  private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT,
-      String credentialsFilePath) throws IOException {
+  private static Credential getCredentials(NetHttpTransport httpTransport,
+      String credentialsFilePath, List<String> scopes, JsonFactory jsonFactory) throws IOException {
     // Load client secrets.
     InputStream in = CalendarsController.class.getResourceAsStream(credentialsFilePath);
     if (in == null) {
       throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
     }
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory,
         new InputStreamReader(in));
 
     // Build flow and trigger user authorization request.
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT,
-        JSON_FACTORY, clientSecrets, SCOPES).setDataStoreFactory(
+    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
+        jsonFactory, clientSecrets, scopes).setDataStoreFactory(
             new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH))).setAccessType("offline")
         .build();
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
@@ -204,7 +189,5 @@ public class GoogleDatabase implements Database {
       return GoogleDatabase.this.service.events().list(calendarId).execute().getItems().stream()
           .map(GoogleEventTable::toEvent).toList();
     }
-
-
   }
 }
