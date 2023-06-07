@@ -1,5 +1,6 @@
 package quikcal.controller;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public interface Controller {
   }
 
   @ResponseStatus(HttpStatus.BAD_GATEWAY)
-  @ExceptionHandler(IOException.class)
+  @ExceptionHandler(GoogleJsonResponseException.class)
   default String handleIOExceptions(IOException exception) {
     return "Failed to connect to database: " + exception.getMessage();
   }

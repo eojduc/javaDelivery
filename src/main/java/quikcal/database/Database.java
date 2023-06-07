@@ -1,12 +1,11 @@
 package quikcal.database;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.ResourceBundle;
-import quikcal.Configuration;
 import quikcal.model.Calendar;
 import quikcal.model.Event;
+import quikcal.model.User;
 
 /**
  * Represents a database that stores calendars and events.
@@ -16,17 +15,19 @@ public interface Database {
   /**
    * Creates a database based on the configuration.
    */
-  static Database create(Configuration.Database configuration)
-      throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+  static Database create(Config config)
+      throws Exception {
     ResourceBundle bundle = ResourceBundle.getBundle(Database.class.getSimpleName());
-    return Class.forName(bundle.getString(configuration.type()))
+    return Class.forName(bundle.getString(config.type()))
         .asSubclass(Database.class)
-        .getConstructor(Configuration.Database.class).newInstance(configuration);
+        .getConstructor().newInstance();
   }
 
   CalendarTable calendars();
 
   EventTable events();
+
+  UserTable users();
 
   interface EventTable {
 
@@ -52,6 +53,21 @@ public interface Database {
     void delete(String calendarId) throws IOException;
 
     List<Calendar> list() throws IOException;
+  }
 
+  interface UserTable {
+
+      User insert(User user) throws IOException;
+
+      User get(String userId) throws IOException;
+
+      User update(String userId, User element) throws IOException;
+
+      void delete(String userId) throws IOException;
+
+      List<User> list() throws IOException;
+  }
+
+  record Config(String type, String credentials) {
   }
 }

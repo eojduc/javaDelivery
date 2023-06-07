@@ -1,6 +1,8 @@
 HELP.md
 .gradle
 build/
+frontend/node_modules/
+tokens/
 src/main/resources/credentials.json
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

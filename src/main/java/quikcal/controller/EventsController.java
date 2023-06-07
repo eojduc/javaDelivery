@@ -1,8 +1,8 @@
 package quikcal.controller;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,19 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import quikcal.Application;
 import quikcal.database.Database;
 import quikcal.model.Event;
 
 @RestController
 @RequestMapping("/events")
 public class EventsController implements Controller {
-  private final Database database;
 
-  public EventsController()
-      throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-    this.database = Database.create(Application.config().database());
-  }
+  @Autowired
+  private Database database;
 
   @GetMapping("{calendarId}")
   List<Event> list(@PathVariable String calendarId) throws IOException {
@@ -31,7 +27,8 @@ public class EventsController implements Controller {
   }
 
   @GetMapping("{calendarId}/{eventId}")
-  Event get(@PathVariable String calendarId, @PathVariable String eventId) throws IOException {
+  Event get(@PathVariable String calendarId, @PathVariable String eventId)
+      throws IOException {
     return this.database.events().get(calendarId, eventId);
   }
 
@@ -42,13 +39,13 @@ public class EventsController implements Controller {
   }
 
   @PostMapping("{calendarId}")
-  Event post(@PathVariable String calendarId, @RequestBody Event event) throws IOException {
+  Event post(@PathVariable String calendarId, @RequestBody Event event)
+      throws IOException {
     return this.database.events().insert(calendarId, event);
   }
 
   @DeleteMapping("{calendarId}/{eventId}")
-  String delete(@PathVariable String calendarId, @PathVariable String eventId)
-      throws IOException {
+  String delete(@PathVariable String calendarId, @PathVariable String eventId) throws IOException {
     this.database.events().delete(calendarId, eventId);
     return "Event deleted";
   }

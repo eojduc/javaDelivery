@@ -1,6 +1,6 @@
 {
   "database": {
-    "type": "google",
+    "type": "combined",
     "credentials": "/credentials.json"
   }
 }

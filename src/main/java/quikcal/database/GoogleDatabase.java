@@ -19,23 +19,25 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import quikcal.Configuration;
+import org.springframework.stereotype.Component;
 import quikcal.controller.CalendarsController;
+import quikcal.database.Database.CalendarTable;
+import quikcal.database.Database.EventTable;
 import quikcal.model.Calendar;
 import quikcal.model.Event;
 
-
-public class GoogleDatabase implements Database {
+@Component
+public class GoogleDatabase {
   /**
    * Directory to store authorization tokens for this application.
    */
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
   private final com.google.api.services.calendar.Calendar service;
 
-  public GoogleDatabase(Configuration.Database configuration) throws Exception {
+  public GoogleDatabase() throws Exception {
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-    Credential credential = GoogleDatabase.getCredentials(httpTransport, configuration.credentials(), List.of(CalendarScopes.CALENDAR), jsonFactory);
+    Credential credential = GoogleDatabase.getCredentials(httpTransport, "/credentials.json", List.of(CalendarScopes.CALENDAR), jsonFactory);
     this.service = new com.google.api.services.calendar.Calendar.Builder(httpTransport,
         jsonFactory,
         credential).build();
@@ -44,8 +46,8 @@ public class GoogleDatabase implements Database {
   /**
    * Creates an authorized Credential object.
    */
-  private static Credential getCredentials(NetHttpTransport httpTransport,
-      String credentialsFilePath, List<String> scopes, JsonFactory jsonFactory) throws IOException {
+  private static Credential getCredentials(final NetHttpTransport httpTransport,
+      final String credentialsFilePath, final List<String> scopes, final JsonFactory jsonFactory) throws IOException {
     // Load client secrets.
     InputStream in = CalendarsController.class.getResourceAsStream(credentialsFilePath);
     if (in == null) {
@@ -65,15 +67,14 @@ public class GoogleDatabase implements Database {
     return credential;
   }
 
-  @Override
   public CalendarTable calendars() {
     return new CalendarTable() {
       private static Calendar toCalendar(
-          com.google.api.services.calendar.model.Calendar googleCalendar) {
+          final com.google.api.services.calendar.model.Calendar googleCalendar) {
         return new quikcal.model.Calendar(googleCalendar.getSummary(), googleCalendar.getId());
       }
       private static com.google.api.services.calendar.model.Calendar toGoogleCalendar(
-          Calendar calendar) {
+          final Calendar calendar) {
         com.google.api.services.calendar.model.Calendar googleCalendar = new com.google.api.services.calendar.model.Calendar();
         googleCalendar.setSummary(calendar.summary());
         googleCalendar.setId(calendar.id());
@@ -81,26 +82,25 @@ public class GoogleDatabase implements Database {
       }
 
       @Override
-      public Calendar insert(Calendar calendar) throws IOException {
+      public Calendar insert(final Calendar calendar) throws IOException {
         com.google.api.services.calendar.model.Calendar googleCalendar = GoogleDatabase.this.service.calendars()
             .insert(toGoogleCalendar(calendar)).execute();
         com.google.api.services.calendar.model.CalendarListEntry calendarListEntry = new com.google.api.services.calendar.model.CalendarListEntry();
         calendarListEntry.setId(googleCalendar.getId());
         GoogleDatabase.this.service.calendarList().insert(calendarListEntry).execute();
         return toCalendar(googleCalendar);
-
       }
 
       @Override
-      public quikcal.model.Calendar update(String calendarId, Calendar calendar)
+      public Calendar update(final String calendarId, final Calendar calendar)
           throws IOException {
-        GoogleDatabase.this.service.calendars()
-            .update(calendarId, toGoogleCalendar(calendar)).execute();
-        return calendar;
+        return toCalendar(
+            GoogleDatabase.this.service.calendars().update(calendarId, toGoogleCalendar(calendar)).execute());
+
       }
 
       @Override
-      public Calendar get(String calendarId) throws IOException {
+      public Calendar get(final String calendarId) throws IOException {
         return toCalendar(
             GoogleDatabase.this.service.calendars().get(calendarId).execute());
       }
@@ -117,16 +117,15 @@ public class GoogleDatabase implements Database {
       }
 
       @Override
-      public void delete(String calendarId) throws IOException {
+      public void delete(final String calendarId) throws IOException {
         GoogleDatabase.this.service.calendars().delete(calendarId).execute();
       }
     };
   }
 
-  @Override
   public EventTable events() {
     return new EventTable() {
-      private static Event toEvent(com.google.api.services.calendar.model.Event googleEvent) {
+      private static Event toEvent(final com.google.api.services.calendar.model.Event googleEvent) {
         Instant start, end;
         if (googleEvent.getStart().getDateTime() != null) {
           start = Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue());
@@ -138,7 +137,7 @@ public class GoogleDatabase implements Database {
         return new Event(googleEvent.getSummary(), googleEvent.getId(), start, end);
       }
 
-      private static com.google.api.services.calendar.model.Event toGoogleEvent(Event event) {
+      private static com.google.api.services.calendar.model.Event toGoogleEvent(final Event event) {
         com.google.api.services.calendar.model.Event googleEvent = new com.google.api.services.calendar.model.Event();
         googleEvent.setStart(new com.google.api.services.calendar.model.EventDateTime().setDateTime(
             new DateTime(event.start().toEpochMilli())));
@@ -148,34 +147,32 @@ public class GoogleDatabase implements Database {
       }
 
       @Override
-      public Event insert(String calendarId, Event event) throws IOException {
+      public Event insert(final String calendarId, final Event event) throws IOException {
         return toEvent(
-            GoogleDatabase.this.service.events().insert(calendarId, toGoogleEvent(event))
-                .execute());
+              GoogleDatabase.this.service.events().insert(calendarId, toGoogleEvent(event)).execute());
       }
 
       @Override
-      public Event get(String calendarId, String eventId) throws IOException {
+      public Event get(final String calendarId, final String eventId) throws IOException {
+          return toEvent(
+              GoogleDatabase.this.service.events().get(calendarId, eventId).execute());
+      }
+
+      @Override
+      public Event update(final String calendarId, final String eventId, final Event event) throws IOException {
         return toEvent(
-            GoogleDatabase.this.service.events().get(calendarId, eventId).execute());
+              GoogleDatabase.this.service.events().update(calendarId, eventId, toGoogleEvent(event)).execute());
       }
 
       @Override
-      public Event update(String calendarId, String eventId, Event event) throws IOException {
-        GoogleDatabase.this.service.events()
-            .update(calendarId, eventId, toGoogleEvent(event)).execute();
-        return event;
+      public void delete(final String calendarId, final String eventId) throws IOException {
+          GoogleDatabase.this.service.events().delete(calendarId, eventId).execute();
       }
 
       @Override
-      public void delete(String calendarId, String eventId) throws IOException {
-        GoogleDatabase.this.service.events().delete(calendarId, eventId).execute();
-      }
-
-      @Override
-      public List<Event> list(String calendarId) throws IOException {
-        return GoogleDatabase.this.service.events().list(calendarId).execute().getItems().stream()
-            .map(googleEvent -> toEvent(googleEvent)).toList();
+      public List<Event> list(final String calendarId) throws IOException {
+          return GoogleDatabase.this.service.events().list(calendarId).execute().getItems().stream()
+              .map(googleEvent -> toEvent(googleEvent)).toList();
       }
     };
   }
