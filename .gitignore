@@ -4,6 +4,7 @@ build/
 frontend/node_modules/
 tokens/
 src/main/resources/credentials.json
+src/main/resources/application.properties
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
