@@ -32,12 +32,13 @@ public class GoogleDatabase {
    * Directory to store authorization tokens for this application.
    */
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
+  private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
   private final com.google.api.services.calendar.Calendar service;
 
   public GoogleDatabase() throws Exception {
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-    Credential credential = GoogleDatabase.getCredentials(httpTransport, "/credentials.json", List.of(CalendarScopes.CALENDAR), jsonFactory);
+    Credential credential = GoogleDatabase.getCredentials(httpTransport, CREDENTIALS_FILE_PATH, List.of(CalendarScopes.CALENDAR), jsonFactory);
     this.service = new com.google.api.services.calendar.Calendar.Builder(httpTransport,
         jsonFactory,
         credential).build();
@@ -139,6 +140,7 @@ public class GoogleDatabase {
 
       private static com.google.api.services.calendar.model.Event toGoogleEvent(final Event event) {
         com.google.api.services.calendar.model.Event googleEvent = new com.google.api.services.calendar.model.Event();
+        googleEvent.setSummary(event.name());
         googleEvent.setStart(new com.google.api.services.calendar.model.EventDateTime().setDateTime(
             new DateTime(event.start().toEpochMilli())));
         googleEvent.setEnd(new com.google.api.services.calendar.model.EventDateTime().setDateTime(

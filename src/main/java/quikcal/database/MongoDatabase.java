@@ -4,11 +4,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quikcal.database.Database.UserTable;
-import quikcal.database.repository.UserRepository;
 import quikcal.model.User;
 
 @Component
 public class MongoDatabase {
+
   @Autowired
   private UserRepository userRepository;
   public UserTable users() {

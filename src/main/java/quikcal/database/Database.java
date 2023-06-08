@@ -12,17 +12,6 @@ import quikcal.model.User;
  */
 public interface Database {
 
-  /**
-   * Creates a database based on the configuration.
-   */
-  static Database create(Config config)
-      throws Exception {
-    ResourceBundle bundle = ResourceBundle.getBundle(Database.class.getSimpleName());
-    return Class.forName(bundle.getString(config.type()))
-        .asSubclass(Database.class)
-        .getConstructor().newInstance();
-  }
-
   CalendarTable calendars();
 
   EventTable events();
