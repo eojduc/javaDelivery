@@ -5,7 +5,7 @@ const App = () => {
   const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/projects").then(response => {
+    axios.get("/projects").then(response => {
       setProjects(response.data);
     });
   }, []);
