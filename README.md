@@ -1,0 +1,1 @@
+This repository is a project that seeks to integrate Google OCR and ChatGPT into an intelligent texting service used to manage administrative tasks. Say goodbye to scanning and scheduling!
