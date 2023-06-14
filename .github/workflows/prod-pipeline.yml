@@ -22,11 +22,12 @@ jobs:
       - name: Report purpose
         run: |
           echo "Processing another thing here with a python script"
-          pwd
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: Check out repository code
+        uses: actions/checkout@v3
       - name: Execute script
         run: |
           ls
