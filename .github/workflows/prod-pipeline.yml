@@ -8,20 +8,17 @@ jobs:
   Stage-1:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Testing repo clone and list."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
+      - run: echo "Doing startup works"
+      # - name: Check out repository code
+      #   uses: actions/checkout@v3
+      # - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      # - name: List files in the repository
+      #   run: |
+      #     ls ${{ github.workspace }}
 
   Stage-2:
     runs-on: ubuntu-latest
     steps:
-      - name: Report purpose
-        run: |
-          echo "Processing another thing here with a python script"
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -29,12 +26,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Execute script
-        run: |
-          ls
-          cd pipeline_tools
-          ls
-          cd ..
-          python3 pipeline_tools/basic.py 
+        run: python3 pipeline_tools/basic.py 
          
   Stage-3:
     runs-on: ubuntu-latest
