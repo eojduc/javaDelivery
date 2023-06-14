@@ -21,6 +21,7 @@ jobs:
     steps:
       - name: Report purpose
         run: echo "Processing another thing here with a python script"
+        run: pwd
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
