@@ -10,6 +10,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * creates a google service object.
+ * creates an object that can be used to access the Google Calendar API.
  */
 
 @Component
@@ -29,13 +30,13 @@ public class GoogleService {
    */
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-  private final com.google.api.services.calendar.Calendar service;
+  private final Calendar service;
   public GoogleService() throws Exception {
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
     Credential credential = getCredentials(httpTransport, CREDENTIALS_FILE_PATH, List.of(
         CalendarScopes.CALENDAR), jsonFactory);
-    this.service = new com.google.api.services.calendar.Calendar.Builder(httpTransport,
+    this.service = new Calendar.Builder(httpTransport,
         jsonFactory,
         credential).build();
   }
@@ -63,7 +64,7 @@ public class GoogleService {
     //returns an authorized Credential object.
     return credential;
   }
-  public com.google.api.services.calendar.Calendar getService() {
+  public Calendar get() {
     return service;
   }
 
