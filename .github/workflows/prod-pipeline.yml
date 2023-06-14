@@ -28,7 +28,12 @@ jobs:
         with:
           python-version: 3.8
       - name: Execute script
-        run: python3 pipeline_tools/basic.py 
+        run: |
+          ls
+          cd pipeline_tools
+          ls
+          cd ..
+          python3 pipeline_tools/basic.py 
          
   Stage-3:
     runs-on: ubuntu-latest
